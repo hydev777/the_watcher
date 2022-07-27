@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'dart:ui' as ui;
 import 'dart:io' as io;
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,10 +13,15 @@ enum TypeOfInfo { image, photo }
 
 class ImageDetectionProvider with ChangeNotifier {
   List<ImageLabel> _listOfInformation = [];
-  ui.Image? _image;
+  Image? _image;
   final ImagePicker _picker = ImagePicker();
+  bool _showImage = false;
 
-  ui.Image? get image {
+  bool get showImage {
+    return _showImage;
+  }
+
+  Image? get image {
     return _image;
   }
 
@@ -26,6 +32,14 @@ class ImageDetectionProvider with ChangeNotifier {
   set fillListOfInformation(List<ImageLabel> list) {
     _listOfInformation = list;
     notifyListeners();
+  }
+
+  void getImage(String path) {
+
+    List<int> imageBytes = io.File(path).readAsBytesSync();
+    String base64Image = base64Encode(imageBytes);
+    _image = Image.memory(base64Decode(base64Image), height: 300,);
+
   }
 
   Future<void> extractInformation(String path) async {
@@ -43,12 +57,17 @@ class ImageDetectionProvider with ChangeNotifier {
       final String text = label.label;
       final int index = label.index;
       final double confidence = label.confidence;
+      _listOfInformation.add(ImageLabel( label: label.label, confidence: label.confidence, index: label.index ));
       print({ "-----------------", text, index, confidence });
     }
 
+    getImage(path);
+    _showImage = true;
+    notifyListeners();
+
   }
 
-  void processImage(TypeOfInfo type) async {
+  Future<void> processImage(TypeOfInfo type) async {
 
     if(type == TypeOfInfo.image) {
 
@@ -56,7 +75,8 @@ class ImageDetectionProvider with ChangeNotifier {
 
       await extractInformation(image!.path);
 
-    } else if(type == TypeOfInfo.photo) {
+    }
+    else if(type == TypeOfInfo.photo) {
 
       final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
 

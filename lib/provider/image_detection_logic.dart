@@ -13,7 +13,7 @@ enum TypeOfInfo { image, photo }
 
 class ImageDetectionProvider with ChangeNotifier {
   List<ImageLabel> _listOfInformation = [];
-  Image? _image;
+  Image? _image = Image.asset("assets/images/example.jpg");
   final ImagePicker _picker = ImagePicker();
   bool _showImage = false;
 
@@ -31,6 +31,12 @@ class ImageDetectionProvider with ChangeNotifier {
 
   set fillListOfInformation(List<ImageLabel> list) {
     _listOfInformation = list;
+    notifyListeners();
+  }
+
+  void reset() {
+    _showImage = false;
+    _listOfInformation = [];
     notifyListeners();
   }
 
@@ -57,7 +63,9 @@ class ImageDetectionProvider with ChangeNotifier {
       final String text = label.label;
       final int index = label.index;
       final double confidence = label.confidence;
-      _listOfInformation.add(ImageLabel( label: label.label, confidence: label.confidence, index: label.index ));
+      if(label.confidence > 5) {
+        _listOfInformation.add(ImageLabel( label: label.label, confidence: label.confidence, index: label.index ));
+      }
       print({ "-----------------", text, index, confidence });
     }
 

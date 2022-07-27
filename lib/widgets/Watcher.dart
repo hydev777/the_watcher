@@ -70,70 +70,100 @@ class _WatcherState extends State<Watcher> {
     Colors.red,
   ];
 
+  final colorizeColors2 = [
+    Colors.deepOrange,
+    Colors.amber,
+    Colors.lightBlueAccent,
+    Colors.black38,
+  ];
+
   @override
   Widget build(BuildContext context) {
     bool showImage = Provider.of<ImageDetectionProvider>(context).showImage;
     Image image = Provider.of<ImageDetectionProvider>(context).image ?? Image.asset('');
     List<ImageLabel> informationExtracted = Provider.of<ImageDetectionProvider>(context).informationExtracted;
+    final imageDetectionActions = Provider.of<ImageDetectionProvider>(context);
 
     return SafeArea(
       child: Scaffold(
         body: Stack(
           children: [
-            AnimatedAlign(
-              duration: const Duration(seconds: 1),
-              alignment: showImage ? Alignment.topCenter : Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: !showImage
-                    ? TextButton(
-                        onPressed: () {
-                          getImage();
-                        },
-                        child: const Text(
-                          'I wanna see...',
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                      )
-                    : Column(
-                        children: [
-                          AnimatedTextKit(
-                            repeatForever: true,
-                            pause: const Duration(milliseconds: 500),
-                            animatedTexts: [
-                              ColorizeAnimatedText(
-                                'This is what I see',
-                                textStyle: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                                colors: colorizeColors,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          image,
-                          const SizedBox(height: 20),
-                          Expanded(
-                            child: ListView(
-                              children: informationExtracted.map((information) {
-
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Label: ${information.label}", style: const TextStyle(color: Colors.black, fontSize: 18)),
-                                      const SizedBox(width: 5),
-                                      Text("Confidence: ${information.confidence.toString()} ", style: const TextStyle(color: Colors.black, fontSize: 18))
-                                    ],
-                                  ),
-                                );
-
-                              }).toList(),
-                            ),
-                          )
-                        ],
+            !showImage
+                ? Center(
+                    child: TextButton(
+                      onPressed: () {
+                        getImage();
+                      },
+                      child: const Text(
+                        'I wanna see...',
+                        style: TextStyle(fontSize: 18.0, color: Colors.redAccent),
                       ),
-              ),
-            ),
+                    ),
+                  )
+                : AnimatedOpacity(
+                    duration: const Duration(seconds: 2),
+                    opacity: showImage ? 1 : 0,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        image,
+                        const SizedBox(height: 20),
+                        AnimatedTextKit(
+                          repeatForever: true,
+                          pause: const Duration(milliseconds: 500),
+                          animatedTexts: [
+                            ColorizeAnimatedText(
+                              'This is what I see',
+                              textStyle: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                              colors: colorizeColors,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: ListView(
+                            children: informationExtracted.map((information) {
+                              return Container(
+                                padding: const EdgeInsets.all(15),
+                                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                                decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(10)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Text("Label: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                        Text(information.label, style: const TextStyle(color: Colors.white, fontSize: 18))
+                                      ],
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Row(
+                                      children: [
+                                        const Text("Confidence: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                        Text(information.confidence.toInt().toString(), style: const TextStyle(color: Colors.white, fontSize: 18))
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+
+                                imageDetectionActions.reset();
+
+                              },
+                              child: const Text('Let me see again...', style: TextStyle(color: Colors.redAccent, fontSize: 18)),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
           ],
         ),
       ),

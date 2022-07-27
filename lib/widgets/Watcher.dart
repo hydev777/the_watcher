@@ -20,13 +20,6 @@ class _WatcherState extends State<Watcher> {
     Colors.red,
   ];
 
-  final colorizeColors2 = [
-    Colors.deepOrange,
-    Colors.amber,
-    Colors.lightBlueAccent,
-    Colors.black38,
-  ];
-
   void getImage() {
     final imageDetectionActions = Provider.of<ImageDetectionProvider>(context, listen: false);
 
@@ -100,68 +93,70 @@ class _WatcherState extends State<Watcher> {
                   ),
                 ),
               ),
-              secondChild: informationExtracted.isNotEmpty ? AnimatedOpacity(
-                duration: const Duration(seconds: 3),
-                opacity: showImage ? 1.0 : 0,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    image,
-                    const SizedBox(height: 20),
-                    AnimatedTextKit(
-                      repeatForever: true,
-                      pause: const Duration(milliseconds: 500),
-                      animatedTexts: [
-                        ColorizeAnimatedText(
-                          'This is what I see',
-                          textStyle: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-                          colors: colorizeColors,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: ListView(
-                        children: informationExtracted.map((information) {
-                          return Container(
-                            padding: const EdgeInsets.all(15),
-                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                            decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(10)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Text("Label: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                                    Text(information.label, style: const TextStyle(color: Colors.white, fontSize: 18))
-                                  ],
-                                ),
-                                const SizedBox(width: 5),
-                                Row(
-                                  children: [
-                                    const Text("Confidence: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                                    Text(information.confidence.toInt().toString(), style: const TextStyle(color: Colors.white, fontSize: 18))
-                                  ],
-                                )
-                              ],
+              secondChild: informationExtracted.isNotEmpty
+                  ? AnimatedOpacity(
+                      duration: const Duration(seconds: 3),
+                      opacity: showImage ? 1.0 : 0,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          image,
+                          const SizedBox(height: 20),
+                          AnimatedTextKit(
+                            repeatForever: true,
+                            pause: const Duration(milliseconds: 500),
+                            animatedTexts: [
+                              ColorizeAnimatedText(
+                                'This is what I see',
+                                textStyle: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                                colors: colorizeColors,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Expanded(
+                            child: ListView(
+                              children: informationExtracted.map((information) {
+                                return Container(
+                                  padding: const EdgeInsets.all(15),
+                                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                                  decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(10)),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Text("Label: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                          Text(information.label, style: const TextStyle(color: Colors.white, fontSize: 18))
+                                        ],
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Row(
+                                        children: [
+                                          const Text("Confidence: ", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                                          Text(information.confidence.toInt().toString(), style: const TextStyle(color: Colors.white, fontSize: 18))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
                             ),
-                          );
-                        }).toList(),
+                          ),
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  imageDetectionActions.reset();
+                                },
+                                child: const Text('Let me see again...', style: TextStyle(color: Colors.redAccent, fontSize: 18)),
+                              )
+                            ],
+                          )
+                        ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            imageDetectionActions.reset();
-                          },
-                          child: const Text('Let me see again...', style: TextStyle(color: Colors.redAccent, fontSize: 18)),
-                        )
-                      ],
                     )
-                  ],
-                ),
-              ) : Container(),
+                  : Container(),
               crossFadeState: !showImage ? CrossFadeState.showFirst : CrossFadeState.showSecond,
               duration: const Duration(seconds: 1),
             ),

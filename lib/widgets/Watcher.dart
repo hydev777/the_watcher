@@ -96,7 +96,7 @@ class _WatcherState extends State<Watcher> {
                   },
                   child: const Text(
                     'I wanna see...',
-                    style: TextStyle(fontSize: 18.0, color: Colors.redAccent),
+                    style: TextStyle(fontSize: 20.0, color: Colors.redAccent),
                   ),
                 ),
               ),

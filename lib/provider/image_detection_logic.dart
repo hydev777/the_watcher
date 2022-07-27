@@ -41,18 +41,18 @@ class ImageDetectionProvider with ChangeNotifier {
   }
 
   void getImage(String path) {
-
     List<int> imageBytes = io.File(path).readAsBytesSync();
     String base64Image = base64Encode(imageBytes);
-    _image = Image.memory(base64Decode(base64Image), height: 300,);
-
+    _image = Image.memory(
+      base64Decode(base64Image),
+      height: 300,
+    );
   }
 
   Future<void> extractInformation(String path) async {
-
     final inputImage = InputImage.fromFilePath(path);
 
-    final modelPath = await getModel('assets/ml/object_labeler.tflite');
+    final modelPath = await getModel('assets/ml/object_labeler2.tflite');
     final options = LocalLabelerOptions(modelPath: modelPath);
     final imageLabeler = ImageLabeler(options: options);
 
@@ -63,35 +63,24 @@ class ImageDetectionProvider with ChangeNotifier {
       final String text = label.label;
       final int index = label.index;
       final double confidence = label.confidence;
-      if(label.confidence > 5) {
-        _listOfInformation.add(ImageLabel( label: label.label, confidence: label.confidence, index: label.index ));
-      }
-      print({ "-----------------", text, index, confidence });
+      _listOfInformation.add(ImageLabel(label: label.label, confidence: label.confidence, index: label.index));
     }
 
     getImage(path);
     _showImage = true;
     notifyListeners();
-
   }
 
   Future<void> processImage(TypeOfInfo type) async {
-
-    if(type == TypeOfInfo.image) {
-
+    if (type == TypeOfInfo.image) {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
       await extractInformation(image!.path);
-
-    }
-    else if(type == TypeOfInfo.photo) {
-
+    } else if (type == TypeOfInfo.photo) {
       final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
 
       await extractInformation(photo!.path);
-
     }
-
   }
 
   Future<String> getModel(String assetPath) async {
@@ -103,8 +92,7 @@ class ImageDetectionProvider with ChangeNotifier {
     final file = io.File(path);
     if (!await file.exists()) {
       final byteData = await rootBundle.load(assetPath);
-      await file.writeAsBytes(byteData.buffer
-          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+      await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
     }
     return file.path;
   }
